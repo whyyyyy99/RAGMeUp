@@ -1,0 +1,220 @@
+body, html {
+    height: 100%;
+    color: #0e0e0e;
+    font-family: Inter, "Noto Sans", sans-serif;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card {
+    background-color: #eeeeee;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+.card-title {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.form-control {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #000;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+input[type="text"].form-control {
+    border: 1px solid #ccc;
+}
+
+.btn-primary {
+    background-image: linear-gradient(to right, #1980e6, #0e5dab);
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    outline: none; /* Remove focus border */
+}
+
+.btn-primary:hover {
+    background-image: linear-gradient(to right, #3d90e3, #246cb3);
+}
+
+.btn-primary:focus {
+    box-shadow: 0 0 0 0.2rem rgba(253, 185, 155, 0.5);
+}
+.card {
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+#loader {
+    display: flex;
+    margin: auto;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.8);
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    color: #fff;
+}
+.article {
+    border: 1px solid #334;
+    border-radius: 5px;
+    padding: 25px;
+}
+.label-agent, .label-human {
+    overflow: hidden;
+    margin: 0;
+    color: #343434;
+    font-family: Roboto;
+    font-weight: 600;
+    margin: 15px;
+}
+.label-agent {
+    background: #ffffff;
+    border: 1px solid #bebebe;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-left: 25px;
+}
+.label-human {
+    background: rgb(25 128 230);
+    color: rgb(248 250 252);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-right: 25px;
+}
+label > p {
+    margin-bottom: 0px;
+}
+.clearfix {
+    clear: both;
+}
+.chatinput {
+    position: fixed;
+    bottom: 50px;
+}
+#dialogue {
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-bottom: 150px;
+  height: 700px;
+}
+.message-row {
+  display: block;
+  margin-bottom: 20px;
+}
+.doclist {
+  padding: 10px;
+  font-size: 0.9em;
+  color: #777;
+}
+.doclink {
+    display: block;
+    padding-top:1px;
+    padding-bottom: 1px;
+    color: #777;
+    font-size: 0.9em;
+}
+.doclink:hover {
+    color: #666;
+}
+.doclink:active {
+    color: #555;
+}
+.doccontent {
+    color: #777;
+    font-size: 0.9em;
+    padding-top: 5px;
+    padding-bottom: 1px;
+}
+
+$dot-width: 10px;
+$dot-color: #3b5998;
+$speed: 1.5s;
+
+.typing {
+  position: relative;
+
+  span {
+    content: '';
+    animation: blink $speed infinite;
+    animation-fill-mode: both;
+    height: $dot-width;
+    width: $dot-width;
+    background: $dot-color;
+    position: absolute;
+    left:0;
+    top:0;
+    border-radius: 50%;
+
+    &:nth-child(2) {
+      animation-delay: .2s;
+      margin-left: $dot-width * 1.5;
+    }
+
+    &:nth-child(3) {
+      animation-delay: .4s;
+      margin-left: $dot-width * 3;
+    }
+  }
+}
+
+
+@keyframes blink {
+  0% {
+    opacity: .1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: .1;
+  }
+}
+
+.documentdiv {
+    max-height: 40vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+    -ms-overflow-style: none;
+}
+
+.documentdiv::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+}
+
+.documentdiv::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.documentdiv::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.documentdiv::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.documentshown {
+    background-color: #dee2e6 !important;
+}
