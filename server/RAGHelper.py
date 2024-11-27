@@ -202,9 +202,9 @@ class RAGHelper:
             list: A list of loaded Document objects.
         """
         self.logger.info(f"Data directory: {self.data_dir}")
-        self.logger.info(f"File types to load: {self.file_types}")
-        docs = self._load_documents()
-        self.logger.info(f"Number of documents loaded: {len(docs)}")
+        if not os.path.exists(self.data_dir):
+            self.logger.error(f"Data directory does not exist: {self.data_dir}")
+            return []
         docs = []
         for file_type in self.file_types:
             try:
@@ -262,8 +262,10 @@ class RAGHelper:
                 elif file_type == "xml":
                     docs += self._load_xml_files()
             except Exception as e:
+                self.logger.error(f"Error loading {file_type} files: {e}")
                 print(f"Error loading {file_type} files: {e}")
 
+        self.logger.info(f"Number of documents loaded: {len(docs)}")
         return self._filter_metadata(docs)
 
     def _load_json_document(self, filename):
