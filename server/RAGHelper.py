@@ -22,9 +22,10 @@ from lxml import etree
 from PostgresBM25Retriever import PostgresBM25Retriever
 from ScoredCrossEncoderReranker import ScoredCrossEncoderReranker
 from tqdm import tqdm
-from text_to_sql import TextToSQL
+from text2_sql import TextToSQL
 from document_sql_combiner import DocumentSQLCombiner
-from langchain.llms import OpenAI
+from transformers import pipeline
+
 
 
 class RAGHelper:
@@ -69,7 +70,7 @@ class RAGHelper:
         self.xml_xpath = os.getenv("xml_xpath")
         self.json_text_content = os.getenv("json_text _content", "false").lower() == 'true'
         self.json_schema = os.getenv("json_schema")
-        self.llm = OpenAI(model_name="gpt-3.5-turbo")
+        self.llm = pipeline("text-generation", model="gpt2")
         if not self.vector_store_sparse_uri:
             self.logger.error("Environment variable 'vector_store_sparse_uri' is not set.")
             raise ValueError("Missing Postgres connection URI in 'vector_store_sparse_uri'")
@@ -598,12 +599,14 @@ class RAGHelper:
 
         # 将检索结果和用户查询注入到 LLM 中生成答案
         if hasattr(self, 'llm') and self.llm:
-            self.logger.info("Generating final answer using LLM.")
-            answer = self.llm.generate_answer(user_query, retrieved_docs)
+            self.logger.info("Generating final answer using Hugging Face LLM.")
+            context = "\n".join([doc['content'] for doc in retrieved_docs if 'content' in doc])
+            prompt = f"{context}\n\nQuestion: {user_query}\nAnswer:"
+            answer = self.llm(prompt, max_length=200, do_sample=True, top_p=0.95)[0]['generated_text']
         else:
             self.logger.error("LLM is not initialized. Returning only retrieved documents.")
-            answer = "LLM not available. Please check your configuration."
-
+        answer = "LLM not available. Please check your configuration."
+   
         return {
             "answer": answer,
             "history": retrieved_docs,
