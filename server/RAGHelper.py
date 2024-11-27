@@ -200,6 +200,10 @@ class RAGHelper:
         Returns:
             list: A list of loaded Document objects.
         """
+        self.logger.info(f"Data directory: {self.data_dir}")
+        self.logger.info(f"File types to load: {self.file_types}")
+        docs = self._load_documents()
+        self.logger.info(f"Number of documents loaded: {len(docs)}")
         docs = []
         for file_type in self.file_types:
             try:
@@ -406,6 +410,9 @@ class RAGHelper:
 
     def _initialize_bm25retriever(self):
         """Initializes in memory BM25Retriever."""
+        self.logger.info(f"Number of documents loaded for BM25: {len(self.chunked_documents)}")
+        if not self.chunked_documents:
+            raise ValueError("No documents available to initialize BM25Retriever. Check document loading.")
         self.logger.info("Initializing BM25Retriever.")
         self.sparse_retriever = BM25Retriever.from_texts(
             [x.page_content for x in self.chunked_documents],
