@@ -201,7 +201,7 @@ class RAGHelper:
         Returns:
             list: A list of loaded Document objects.
         """
-        self.logger.info(f"Data directory: {self.data_dir}")
+        self.logger.info(f"Starting to load documents from data directory: {self.data_dir}")
         if not os.path.exists(self.data_dir):
             self.logger.error(f"Data directory does not exist: {self.data_dir}")
             return []
