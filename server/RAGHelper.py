@@ -205,6 +205,8 @@ class RAGHelper:
         if not os.path.exists(self.data_dir):
             self.logger.error(f"Data directory does not exist: {self.data_dir}")
             return []
+        files_in_directory = os.listdir(self.data_dir)
+        self.logger.info(f"Files in data directory: {files_in_directory}")
         docs = []
         for file_type in self.file_types:
             try:
@@ -349,6 +351,7 @@ class RAGHelper:
                      metadata={**doc.metadata, 'id': hashlib.md5(doc.page_content.encode()).hexdigest()})
             for doc in self.text_splitter.split_documents(docs)
         ]
+        self.logger.info(f"Number of chunks created: {len(chunked_documents)}")
         return chunked_documents
 
     def _split_and_store_documents(self, docs):
@@ -415,12 +418,21 @@ class RAGHelper:
         """Initializes in memory BM25Retriever."""
         self.logger.info(f"Number of documents loaded for BM25: {len(self.chunked_documents)}")
         if not self.chunked_documents:
+            self.logger.error("No documents available to initialize BM25Retriever. Check document loading.")
+            for file_type in self.file_types:
+                self.logger.warning(f"Ensure {file_type} files are present in the data directory: {self.data_dir}")
             raise ValueError("No documents available to initialize BM25Retriever. Check document loading.")
         self.logger.info("Initializing BM25Retriever.")
-        self.sparse_retriever = BM25Retriever.from_texts(
-            [x.page_content for x in self.chunked_documents],
-            metadatas=[x.metadata for x in self.chunked_documents]
-        )
+        try:
+            self.logger.info("Initializing BM25Retriever.")
+            self.sparse_retriever = BM25Retriever.from_texts(
+                [x.page_content for x in self.chunked_documents],
+                metadatas=[x.metadata for x in self.chunked_documents]
+            )
+            self.logger.info("BM25Retriever successfully initialized.")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize BM25Retriever: {e}")
+            raise
 
     def _initialize_postgresbm25retriever(self):
         """Initializes in memory PostgresBM25Retriever."""
