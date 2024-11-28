@@ -458,9 +458,12 @@ class RAGHelper:
     def retrieve_from_sql(self, user_query):
         sql_query = self.text_to_sql.translate(user_query)
         self.logger.info(f"Received user query for SQL retrieval: {user_query}")
-        self.logger.info(f"Generated SQL Query: {sql_query}")  # 打印生成的 SQL 查询
-        sql_results = self.text_to_sql.execute(sql_query)
-        self.logger.info(f"SQL Query Results: {sql_results}")
+        try:
+            sql_results = self.text_to_sql.execute(sql_query)
+            self.logger.info(f"Generated SQL Query: {sql_query}")  # 打印生成的 SQL 查询
+        except Exception as e:
+            self.logger.error(f"Error executing SQL: {e}")
+            sql_results = []
         return [{"type": "sql_result", "content": result} for result in sql_results]
 
     def _initialize_retrievers(self):
