@@ -28,6 +28,7 @@ from transformers import pipeline
 
 
 
+
 class RAGHelper:
     """
     A helper class to manage retrieval-augmented generation (RAG) processes,
@@ -49,6 +50,24 @@ class RAGHelper:
         self._batch_size = 1000
         # Load environment variables
         self.vector_store_sparse_uri = os.getenv('vector_store_sparse_uri')
+        print("vector_store_sparse_uri:", self.vector_store_sparse_uri)  # 添加这行代码
+         # 测试连接是否有效
+        if not self.vector_store_sparse_uri:
+            self.logger.error("Environment variable 'vector_store_sparse_uri' is not set.")
+            raise ValueError("Missing Postgres connection URI in 'vector_store_sparse_uri'")
+    
+    # 测试连接
+        try:
+            import psycopg2
+            connection = psycopg2.connect(self.vector_store_sparse_uri)
+            connection.close()  # 测试成功后关闭连接
+            print("Postgres connection test: SUCCESS")
+            self.logger.info("Postgres connection test: SUCCESS")
+        except Exception as e:
+            print(f"Postgres connection test: FAILED. Error: {e}")
+            self.logger.error(f"Postgres connection test: FAILED. Error: {e}")
+            raise ValueError("Postgres connection test failed. Please check 'vector_store_sparse_uri'.")
+
         self.vector_store_uri = os.getenv('vector_store_uri')
         self.document_chunks_pickle = os.getenv('document_chunks_pickle')
         self.data_dir = os.getenv("data_directory", "/content/RAGMeUp/server/data")
