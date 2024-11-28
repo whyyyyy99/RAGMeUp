@@ -449,7 +449,7 @@ class RAGHelper:
                     pbar.update(1)
     def retrieve_from_sql(self, user_query):
         sql_query = self.text_to_sql.translate(user_query)
-        self.logger.info(f"Generated SQL Query: {sql_query}")
+        self.logger.info(f"Generated SQL Query: {sql_query}")  # 打印生成的 SQL 查询
         sql_results = self.text_to_sql.execute(sql_query)
         self.logger.info(f"SQL Query Results: {sql_results}")
         return [{"type": "sql_result", "content": result} for result in sql_results]
@@ -584,6 +584,7 @@ class RAGHelper:
         Returns:
             dict: 包括生成的答案、检索到的文档和历史记录。
         """
+        self.logger.info(f"Starting inference pipeline with user query: {user_query}")
         retrieved_docs = {"dense_results": [], "sparse_results": [], "sql_results": []}
 
 
