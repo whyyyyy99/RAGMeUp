@@ -34,10 +34,10 @@ class HomeController @Inject()(
         logger.info(s"Received documents: ${files.json}")
         Ok(views.html.add(files.json.as[Seq[String]]))
       })
-      .recover ( case ex => {
+      .recover {case ex => 
       logger.error("Error fetching documents", ex)
       InternalServerError("Failed to fetch documents")
-      })
+      }
 
   }
   def getDocuments = Action { implicit request: Request[AnyContent] =>
@@ -65,10 +65,10 @@ class HomeController @Inject()(
           logger.info(s"Search response: ${response.json}")
           Ok(response.json)
       )
-      .recover ( case ex => {
+      .recover { case ex => 
       logger.error("Error during search", ex)
       InternalServerError("Failed to perform search")
-      })
+      }
   }
 
   def download(file: String) = Action.async { implicit request: Request[AnyContent] =>
@@ -104,10 +104,10 @@ class HomeController @Inject()(
           Status(response.status)(s"Error: ${response.statusText}")
         }
       }
-      .recover ( case ex => {
+      .recover {case ex => 
       logger.error(s"Error downloading file: $file", ex)
       InternalServerError("Failed to download file")
-      })
+      }
   }
 
   def upload = Action(parse.multipartFormData) { implicit request =>
