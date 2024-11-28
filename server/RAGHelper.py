@@ -201,6 +201,8 @@ class RAGHelper:
         Returns:
             list: A list of loaded Document objects.
         """
+        print(f"Data directory: {rag_helper.data_dir}")
+        print(f"Files in data directory: {os.listdir(rag_helper.data_dir)}")
         self.logger.info(f"Starting to load documents from data directory: {self.data_dir}")
         if not os.path.exists(self.data_dir):
             self.logger.error(f"Data directory does not exist: {self.data_dir}")
@@ -582,7 +584,8 @@ class RAGHelper:
         Returns:
             dict: 包括生成的答案、检索到的文档和历史记录。
         """
-        retrieved_docs = []
+        retrieved_docs = {"dense_results": [], "sparse_results": [], "sql_results": []}
+
 
         # 如果没有历史记录或需要重新检索
         if not history or fetch_new_documents:
@@ -592,45 +595,53 @@ class RAGHelper:
             if self.db:
                 dense_results = self.db.search(user_query)
                 self.logger.info(f"Dense retrieval results: {len(dense_results)} documents retrieved.")
-            else:
-                dense_results = []
+                retrieved_docs["dense_results"] = dense_results
 
             # 2. 稀疏向量检索 (BM25)
             if self.sparse_retriever:
                 sparse_results = self.sparse_retriever.retrieve(user_query)
                 self.logger.info(f"Sparse retrieval results: {len(sparse_results)} documents retrieved.")
-            else:
-                sparse_results = []
+                retrieved_docs["sparse_results"] = sparse_results
 
             # 3. Text-to-SQL 检索
             sql_results = self.retrieve_from_sql(user_query)
             self.logger.info(f"SQL retrieval results: {len(sql_results)} results retrieved.")
-
-            # 合并所有检索结果
-            retrieved_docs = dense_results + sparse_results + sql_results
-
-            # 可选：Reranking
-            if self.rerank and self.rerank_retriever:
-                self.logger.info("Applying Reranking...")
-                retrieved_docs = self.rerank_retriever.rerank(retrieved_docs, user_query)
+            retrieved_docs["sql_results"] = sql_results
 
         else:
             # 如果有历史记录，直接使用
             self.logger.info("Using history for retrieval context.")
             retrieved_docs = history
+        
+        formatted_sql_results = [
+            {"type": "sql_result", "content": f"Result: {result['content']}"}
+            for result in retrieved_docs["sql_results"]
+            if "content" in result
+        ]
+        all_retrieved_docs = (
+            retrieved_docs["dense_results"]
+            + retrieved_docs["sparse_results"]
+            + formatted_sql_results
+        )
 
-        # 将检索结果和用户查询注入到 LLM 中生成答案
-        if hasattr(self, 'llm') and self.llm:
+        if hasattr(self, "llm") and self.llm:
             self.logger.info("Generating final answer using Hugging Face LLM.")
-            context = "\n".join([doc['content'] for doc in retrieved_docs if 'content' in doc])
+            context = "\n".join(
+                [doc["content"] for doc in all_retrieved_docs if "content" in doc]
+            )
             prompt = f"{context}\n\nQuestion: {user_query}\nAnswer:"
-            answer = self.llm(prompt, max_length=200, do_sample=True, top_p=0.95)[0]['generated_text']
+            try:
+                llm_response = self.llm(prompt, max_length=200, do_sample=True, top_p=0.95)
+                answer = llm_response[0]["generated_text"] if llm_response else "No answer generated."
+            except Exception as e:
+                self.logger.error(f"Error generating answer: {e}")
+                answer = "Error occurred while generating the answer."
         else:
             self.logger.error("LLM is not initialized. Returning only retrieved documents.")
-        answer = "LLM not available. Please check your configuration."
-   
+            answer = "LLM not available. Please check your configuration."
+
         return {
             "answer": answer,
-            "history": retrieved_docs,
-            "documents": retrieved_docs
+            "documents": retrieved_docs,  # 结构化展示
+            "all_results": all_retrieved_docs,  # 合并后的展示
         }
