@@ -61,10 +61,10 @@ class HomeController @Inject()(
         "history" -> history,
         "docs" -> docs
       ))
-      .map(response =>
+      .map(response => {
           logger.info(s"Search response: ${response.json}")
           Ok(response.json)
-      )
+      })
       .recover { case ex => 
       logger.error("Error during search", ex)
       InternalServerError("Failed to perform search")
