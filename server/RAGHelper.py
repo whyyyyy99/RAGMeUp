@@ -50,13 +50,6 @@ class RAGHelper:
         self._batch_size = 1000
         # Load environment variables
         self.vector_store_sparse_uri = os.getenv('vector_store_sparse_uri')
-        print("vector_store_sparse_uri:", self.vector_store_sparse_uri)  # 添加这行代码
-        if self.vector_store_sparse_uri:
-            self.sparse_retriever = BM25Retriever.from_pkl(self.vector_store_sparse_uri)
-            self.logger.info("Successfully loaded BM25Retriever.")
-        else:
-            self.logger.error("BM25 index file is not set. Check 'vector_store_sparse_uri'.")
-            raise ValueError("BM25 index file is not set.")
         self.vector_store_uri = os.getenv('vector_store_uri')
         self.document_chunks_pickle = os.getenv('document_chunks_pickle')
         self.data_dir = os.getenv("data_directory", "/content/RAGMeUp/server/data")
