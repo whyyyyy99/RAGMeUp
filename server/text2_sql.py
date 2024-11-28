@@ -1,4 +1,5 @@
 import psycopg2
+import logging
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 class TextToSQL:
