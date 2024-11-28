@@ -51,32 +51,12 @@ class RAGHelper:
         # Load environment variables
         self.vector_store_sparse_uri = os.getenv('vector_store_sparse_uri')
         print("vector_store_sparse_uri:", self.vector_store_sparse_uri)  # 添加这行代码
-         # 测试连接是否有效
-        if self.vector_store_sparse_uri and self.vector_store_sparse_uri.startswith("postgresql://"):
-            try:
-                import psycopg2
-                connection = psycopg2.connect(self.vector_store_sparse_uri)
-                connection.close()  # 测试成功后关闭连接
-                print("Postgres connection test: SUCCESS")
-                self.logger.info("Postgres connection test: SUCCESS")
-            except Exception as e:
-                print(f"Postgres connection test: FAILED. Error: {e}")
-                self.logger.error(f"Postgres connection test: FAILED. Error: {e}")
-                raise ValueError("Postgres connection test failed. Please check 'vector_store_sparse_uri'.")
-            else:
-                print("Not using PostgreSQL for sparse URI.")
-            self.vector_store = os.getenv("vector_store", "milvus")
-            if self.vector_store == "bm25":
-                print("Using BM25 retriever from pickle file...")
-                self.sparse_retriever = BM25Retriever.from_pkl(self.vector_store_sparse_uri)  # This line loads BM25 from pickle
-
-        # If you're using Postgres or Milvus, continue with the initialization as usual
-            elif self.vector_store == "milvus":
-                self._initialize_milvus()
-            elif self.vector_store == "postgres":
-                self._initialize_postgres()
-            else:
-                raise ValueError("Unsupported vector store specified.")
+        if self.vector_store_sparse_uri:
+            self.sparse_retriever = BM25Retriever.from_pkl(self.vector_store_sparse_uri)
+            self.logger.info("Successfully loaded BM25Retriever.")
+        else:
+            self.logger.error("BM25 index file is not set. Check 'vector_store_sparse_uri'.")
+            raise ValueError("BM25 index file is not set.")
         self.vector_store_uri = os.getenv('vector_store_uri')
         self.document_chunks_pickle = os.getenv('document_chunks_pickle')
         self.data_dir = os.getenv("data_directory", "/content/RAGMeUp/server/data")
