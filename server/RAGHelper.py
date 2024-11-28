@@ -606,6 +606,7 @@ class RAGHelper:
 
             # 3. Text-to-SQL 检索
             sql_results = self.retrieve_from_sql(user_query)
+            sql_results = self.retrieve_from_sql(user_query)  # 调用 SQL 检索
             self.logger.info(f"SQL retrieval results: {len(sql_results)} results retrieved.")
             retrieved_docs["sql_results"] = sql_results
 
@@ -640,7 +641,9 @@ class RAGHelper:
         else:
             self.logger.error("LLM is not initialized. Returning only retrieved documents.")
             answer = "LLM not available. Please check your configuration."
-
+        
+        self.logger.info(f"SQL Results: {retrieved_docs['sql_results']}")
+        
         return {
             "answer": answer,
             "documents": retrieved_docs,  # 结构化展示
