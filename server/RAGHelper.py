@@ -201,8 +201,8 @@ class RAGHelper:
         Returns:
             list: A list of loaded Document objects.
         """
-        print(f"Data directory: {rag_helper.data_dir}")
-        print(f"Files in data directory: {os.listdir(rag_helper.data_dir)}")
+        print(f"Data directory: {self.data_dir}")
+        print(f"Files in data directory: {os.listdir(self.data_dir)}")
         self.logger.info(f"Starting to load documents from data directory: {self.data_dir}")
         if not os.path.exists(self.data_dir):
             self.logger.error(f"Data directory does not exist: {self.data_dir}")
