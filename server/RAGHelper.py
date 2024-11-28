@@ -457,6 +457,7 @@ class RAGHelper:
         except Exception as e:
             self.logger.error(f"Error executing SQL: {e}")
             sql_results = []
+        self.logger.info(f"SQL Query Results: {sql_results}")
         return [{"type": "sql_result", "content": result} for result in sql_results]
 
     def _initialize_retrievers(self):
