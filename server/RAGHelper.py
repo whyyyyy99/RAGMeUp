@@ -80,7 +80,7 @@ class RAGHelper:
         # Initialize Text-to-SQL
         text_to_sql_model = os.getenv("text_to_sql_model", "suriya7/t5-base-text-to-sql")
         self.logger.info(f"Initializing TextToSQL with model: {text_to_sql_model}")
-        self.text_to_sql = TextToSQL(model_name=text_to_sql_model, db_uri='postgresql://langchain:langchain@localhost:6024/langchain')
+        self.text_to_sql = TextToSQL(model_name=text_to_sql_model, db_uri= self.vector_store_sparse_uri)
 
         # Initialize DocumentSQLCombiner (optional, only if needed)
         self.document_sql_combiner = DocumentSQLCombiner()
