@@ -453,7 +453,7 @@ class RAGHelper:
         self.logger.info(f"Received user query for SQL retrieval: {user_query}")
         try:
             sql_results = self.text_to_sql.execute(sql_query)
-            self.logger.info(f"Generated SQL Query: {sql_query}")  # 打印生成的 SQL 查询
+            self.logger.info(f"Generated SQL Query: {sql_query}")  
         except Exception as e:
             self.logger.error(f"Error executing SQL: {e}")
             sql_results = []
@@ -579,46 +579,36 @@ class RAGHelper:
         # Add new chunks to the vector database
         self._add_to_vector_database(new_chunks)
     def inference_pipeline(self, user_query, history=None, fetch_new_documents=True):
-        """
-        整合稠密检索、稀疏检索和 Text-to-SQL，生成最终答案。
-
-        Args:
-            user_query (str): 用户的自然语言查询。
-            history (list, optional): 上下文历史记录。
-            fetch_new_documents (bool, optional): 是否需要重新检索新文档。
-
-        Returns:
-            dict: 包括生成的答案、检索到的文档和历史记录。
-        """
+        
         self.logger.info(f"Starting inference pipeline with user query: {user_query}")
         self.logger.info(f"History: {history}, Fetch New Documents: {fetch_new_documents}")
         retrieved_docs = {"dense_results": [], "sparse_results": [], "sql_results": []}
 
 
-        # 如果没有历史记录或需要重新检索
+        # If there is no history or if a new search is required
         if not history or fetch_new_documents:
             self.logger.info("Starting new retrieval process.")
 
-            # 1. 稠密向量检索 (Milvus/pgvector)
+            # 1. Milvus
             if self.db:
                 dense_results = self.db.search(user_query)
                 self.logger.info(f"Dense retrieval results: {len(dense_results)} documents retrieved.")
                 retrieved_docs["dense_results"] = dense_results
 
-            # 2. 稀疏向量检索 (BM25)
+            # 2. BM25
             if self.sparse_retriever:
                 sparse_results = self.sparse_retriever.retrieve(user_query)
                 self.logger.info(f"Sparse retrieval results: {len(sparse_results)} documents retrieved.")
                 retrieved_docs["sparse_results"] = sparse_results
 
-            # 3. Text-to-SQL 检索
+            # 3. Text-to-SQL 
             self.logger.info("Forcing SQL retrieval for testing.")
             sql_results = self.retrieve_from_sql(user_query)
             self.logger.info(f"SQL retrieval results: {len(sql_results)} results retrieved.")
             retrieved_docs["sql_results"] = sql_results
 
         else:
-            # 如果有历史记录，直接使用
+            # If there is a history, just use it directly.
             self.logger.info("Using history for retrieval context.")
             retrieved_docs = history
         
@@ -653,6 +643,6 @@ class RAGHelper:
         
         return {
             "answer": answer,
-            "documents": retrieved_docs,  # 结构化展示
-            "all_results": all_retrieved_docs,  # 合并后的展示
+            "documents": retrieved_docs,  # structured display
+            "all_results": all_retrieved_docs,  # Combined display
         }
