@@ -62,6 +62,7 @@ class RAGHelper:
         self.rerank_model = os.getenv("rerank_model")
         self.rerank_k = int(os.getenv("rerank_k"))
         self.vector_store_k = int(os.getenv("vector_store_k"))
+        self.sql_db=os.getenv('sql_db')
         self.chunk_size = int(os.getenv("chunk_size"))
         self.chunk_overlap = int(os.getenv("chunk_overlap"))
         self.breakpoint_threshold_amount = os.getenv('breakpoint_threshold_amount', 'None')
@@ -80,7 +81,7 @@ class RAGHelper:
         # Initialize Text-to-SQL
         text_to_sql_model = os.getenv("text_to_sql_model", "suriya7/t5-base-text-to-sql")
         self.logger.info(f"Initializing TextToSQL with model: {text_to_sql_model}")
-        self.text_to_sql = TextToSQL(model_name=text_to_sql_model, db_uri= self.vector_store_sparse_uri)
+        self.text_to_sql = TextToSQL(model_name=text_to_sql_model, db_uri= self.sql_db)
 
         # Initialize DocumentSQLCombiner (optional, only if needed)
         self.document_sql_combiner = DocumentSQLCombiner()
